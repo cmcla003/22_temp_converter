@@ -8,6 +8,9 @@ class Converter:
         # Formatting variables
         background_colour = "light gray"
 
+        # Intialise list to hold calculation history
+        self.all_calculations = []
+
         # Converter frame
         self.converter_frame= Frame(bg=background_colour,
                                     pady=10)
@@ -116,6 +119,10 @@ class Converter:
             self.converted_label.configure(text = "Enter a number", fg="orange red")
             self.to_convert_entry.configure(bg=error)
 
+        # add answer to list for history
+        if answer != "Too cold!!!":
+            self.all_calculations.append(answer)
+            print(self.all_calculations)
 
     # round number
     def round_it(self, to_round):
@@ -126,8 +133,6 @@ class Converter:
 
         return rounded
 
-
-        # add answer to list for history
 
 # main routine
 if __name__ == "__main__":
