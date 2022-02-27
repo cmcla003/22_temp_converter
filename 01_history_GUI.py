@@ -9,9 +9,11 @@ class Converter:
         background_colour = "light gray"
 
         # list of conversions (in converter GUI this is a blank list populated with user calculations
-        self.all_calc_list = ['12 degrees C is 53.6 degrees F',
+        '''self.all_calc_list = ['12 degrees C is 53.6 degrees F',
                               '24 degrees C is 75.2 degrees F',
-                              '100 degrees C is 37.8 degrees F']
+                              '100 degrees C is 37.8 degrees F']'''
+
+        self.all_calc_list = []
 
         # Converter main screen GUI
         self.converter_frame= Frame(width=600, height=600, bg=background_colour,
@@ -30,6 +32,9 @@ class Converter:
                                      font="Arial 14 bold",padx=10,pady=10,
                                      command=lambda: self.history(self.all_calc_list))
         self.history_button.grid(row=1)
+
+        if len(self.all_calc_list) == 0:
+            self.history_button.config(state=DISABLED)
 
     def history(self, calc_history):
         print("History")
@@ -74,7 +79,7 @@ class History:
         # generate a string from list of calculations
         history_string = ""
 
-        if len(calc_history) >=7:
+        if len(calc_history) >7:
             for item in range(0,7):
                 history_string += calc_history[len(calc_history) - item -1]+"\n"
 
