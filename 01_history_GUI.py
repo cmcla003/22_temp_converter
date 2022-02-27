@@ -9,11 +9,11 @@ class Converter:
         background_colour = "light gray"
 
         # list of conversions (in converter GUI this is a blank list populated with user calculations
-        '''self.all_calc_list = ['12 degrees C is 53.6 degrees F',
+        self.all_calc_list = ['12 degrees C is 53.6 degrees F',
                               '24 degrees C is 75.2 degrees F',
-                              '100 degrees C is 37.8 degrees F']'''
+                              '100 degrees C is 37.8 degrees F']
 
-        self.all_calc_list = []
+        '''self.all_calc_list = []'''
 
         # Converter main screen GUI
         self.converter_frame= Frame(width=600, height=600, bg=background_colour,
