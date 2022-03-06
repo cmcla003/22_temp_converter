@@ -27,7 +27,6 @@ class Converter:
         self.export_button.grid(row=1)
 
     def export(self):
-        print("You asked for export")
         get_export = Export(self)
         get_export.export_text.configure()
 
@@ -70,7 +69,6 @@ class Export:
                                  font = "Arial 10 italic", justify=LEFT, width=40,
                                  bg="pale violet red",fg="maroon", wrap=225, padx=10, pady=10)
         self.export_warn_text.grid(row=2)
-
         # Entry box for filename (row 3)
         self.filename_entry = Entry(self.export_frame, width=20,
                                       font="Arial 14 bold")
