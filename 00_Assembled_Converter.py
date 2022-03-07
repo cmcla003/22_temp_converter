@@ -1,5 +1,6 @@
 from tkinter import *
 from functools import partial # to prevent unwanted windows
+import re
 import random
 
 class Converter:
@@ -56,7 +57,7 @@ class Converter:
         self.to_f_button.grid(row=0, column=1)
 
         # Answer label (row 4)
-        self.converted_label = Label(self.converter_frame, text="Answer goes here",
+        self.converted_label = Label(self.converter_frame, text="Conversion goes here",
                                              font="Arial 18 bold",
                                              bg=background_colour,
                                              padx=10, pady=10)
@@ -68,22 +69,23 @@ class Converter:
 
 
         # history button (row1)
-        self.history_btn = Button(self.hist_help_frame, text="History",
-                                     font=("Arial 10 italic"),padx=10,pady=10,
+        self.history_btn = Button(self.hist_help_frame, text="Calculation History", width=15,
+                                     font="Arial 10 italic",
                                      command=lambda: self.history(self.all_calc_list))
-        self.history_btn.grid(column=0,row=1)
+        self.history_btn.grid(column=0,row=0)
 
         if len(self.all_calc_list) == 0:
             self.history_btn.config(state=DISABLED)
 
         # help button
         self.help_btn = Button(self.hist_help_frame, text="Help",
-                               font=("Arial 10 italic"),padx=10, pady=10)
-        self.help_btn.grid(column=1, row=1)
+                               font="Arial 10 italic",
+                               command=self.help)
+        self.help_btn.grid(column=1, row=0)
 
     def temp_convert(self, low):
         print(low)
-        error = "tomato"
+        error = "orange red"
 
         # retrieve amount entered into entry feild
         to_convert = self.to_convert_entry.get()
@@ -122,7 +124,6 @@ class Converter:
             # add answer to list for history
             if has_errors!= "yes":
                 self.all_calc_list.append(answer)
-                print(self.all_calc_list)
                 self.history_btn.config(state=NORMAL)
 
         except ValueError:
@@ -139,9 +140,60 @@ class Converter:
         return rounded
 
     def history(self, calc_history):
-        print("History")
-        get_history = History(self, calc_history)
-        get_history.history_text.configure()
+        History(self, calc_history)
+
+    def help(self):
+        get_help = Help(self)
+        get_help.help_text.config()
+
+class Help:
+    def __init__(self, partner):
+
+        background_colour = "pale violet red"
+
+        #disable help button
+        partner.help_btn.config(state=DISABLED)
+
+        #set up Child window
+        self.help_box = Toplevel()
+
+        # if user press cross at top, closes help and releases button
+        self.help_box.protocol('WM_DELETE_WINDOW', partial(self.close_help, partner))
+
+        # Set up GUI
+        self.help_frame = Frame(self.help_box,width=300, bg=background_colour,
+                                    pady=10)
+        self.help_frame.grid()
+
+        # Help heading (row 0)
+        self.help_label = Label(self.help_frame, text="Help",
+                                          font=("Arial", "16", "bold"),
+                                          bg=background_colour,
+                                          padx=10,pady=10)
+        self.help_label.grid(row=0)
+
+        # Help text (row 1)
+        self.help_text = Label(self.help_frame, text="Please enter a number in the box "
+                                                     "then push either button to convert "
+                                                     "to degrees C or Degree F.\n "
+                                                     "The calculation history shows up to 7 past conversions, "
+                                                     "with the moste recent at the top.\n"
+                                                     "You can also export your full calculation history "
+                                                     "to a text file if desired.",
+                               justify=LEFT, width=40, bg=background_colour, wrap=250)
+        self.help_text.grid(row=1)
+
+        # Dismiss button (row 2)
+        self.dismiss_btn = Button(self.help_frame, text="Dismiss", width=40,
+                                  font="Arial 10 bold",
+                                  command=partial(self.close_help, partner))
+        self.dismiss_btn.grid(row=2, pady=10)
+
+    def close_help(self,partner):
+
+        #reset help button
+        partner.help_btn.config(state=NORMAL)
+        self.help_box.destroy()
 
 class History:
     def __init__(self, partner, calc_history):
@@ -224,6 +276,7 @@ class History:
         get_export = Export(self)
         get_export.export_text.configure()
 
+
 class Export:
     def __init__(self, partner):
 
@@ -244,47 +297,97 @@ class Export:
         self.export_frame.grid()
 
         # export heading (row 0)
-        self.export_label = Label(self.export_frame, text="Export File",
-                                          font="Arial 16 bold",
-                                          bg=background_colour,
-                                          padx=10,pady=10)
-        self.export_label.grid(row=0)
+        self.export_heading = Label(self.export_frame, text="Export File & Instructions",
+                                          font="Arial 16 bold",bg=background_colour)
+        self.export_heading.grid(row=0)
 
         # export text (row 1)
         self.export_text = Label(self.export_frame, text="Enter a filename in the box below "
-                                                         "and press the save button "
-                                 "to save your calculation history to a text file.",
-                               justify=LEFT, width=40, bg=background_colour, wrap=250, padx=10, pady=10)
+                                                        "and press the save button "
+                                                        "to save your calculation history to a text file.",
+                                 justify=LEFT, width=40, bg=background_colour, wrap=250, padx=10, pady=10)
         self.export_text.grid(row=1)
 
-        # export warning text (row 2)
+        # Export warning text (row 2)
         self.export_warn_text = Label(self.export_frame, text="If the filename you enter already exists, its "
                                                          "contents with be replaced with the current calculation history. ",
                                  font = "Arial 10 italic", justify=LEFT, width=40,
                                  bg="pale violet red",fg="maroon", wrap=225, padx=10, pady=10)
         self.export_warn_text.grid(row=2)
+
         # Entry box for filename (row 3)
         self.filename_entry = Entry(self.export_frame, width=20,
-                                      font="Arial 14 bold")
-        self.filename_entry.grid(row=3)
+                                      font="Arial 14 bold", justify=CENTER)
+        self.filename_entry.grid(row=3,pady=10)
 
+        # Error message labels
+        self.save_error_label = Label(self.export_frame, text = "", fg="maroon", bg=background_colour)
+        self.save_error_label.grid(row=4)
 
         # Buttons
         # Save/ Cancel buttons (row 4)
-        self.export_dismiss_frame = Frame(self.export_frame)
-        self.export_dismiss_frame.grid(row=4, pady=10)
+        self.save_cancel_frame = Frame(self.export_frame)
+        self.save_cancel_frame.grid(row=5, pady=10)
 
         # Save Button
-        self.save_btn = Button(self.export_dismiss_frame, text="Save",
-                                 font="Arial 10 bold",
-                                 command=partial(self.close_export, partner))
+        self.save_btn = Button(self.save_cancel_frame, text="Save",
+                                 command=partial(lambda: self.save_history(partner, calc_history)))
         self.save_btn.grid(row=0, column=0)
 
         # Cancel button
-        self.cancel_btn = Button(self.export_dismiss_frame, text="Cancel",
+        self.cancel_btn = Button(self.save_cancel_frame, text="Cancel",
                                   font="Arial 10 bold",
                                   command=partial(self.close_export, partner))
         self.cancel_btn.grid(row=0, column=1)
+
+    def save_history(self, partner, calc_history):
+        valid_char = "[A-Za-z0-9_]"
+        has_errors = "no"
+
+        filename = self.filename_entry.get()
+        print(filename)
+
+        for letter in filename:
+            if re.match(valid_char, letter):
+                continue
+
+            elif letter == " ":
+                problem = "no spaces allowed"
+
+            else:
+                problem = "no {} allowed".format(letter)
+            has_error = "yes"
+            break
+
+        if filename == "":
+            problem = "can't be blank"
+            has_error = "yes"
+
+        if has_error == "yes":
+            # Display error message
+            self.save_error_label.confi(text="Invalid filemane - {}".format(problem))
+            # Change background
+            self.filename_entry, config(bg="orange red")
+            print()
+
+        #correct file name
+        else:
+
+            # add .txt suffix
+            filename = filename + ".txt"
+
+            # create file to hold data
+            f = open(filename, "w+")
+
+            # add new line at the end of each item
+            for item in calc_history:
+                f.write(item + "\n")
+
+            # close file
+            f.close()
+
+            # close dialogue
+            self.close_export(partner)
 
     def close_export(self,partner):
 
