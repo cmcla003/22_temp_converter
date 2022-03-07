@@ -1,6 +1,7 @@
 from tkinter import *
 from functools import partial # to prevent unwanted windows
 import random
+import re
 
 
 class Converter:
@@ -74,6 +75,27 @@ class Export:
                                       font="Arial 14 bold")
         self.filename_entry.grid(row=3)
 
+        # Error message labels
+        self.save_error_label = Label(self.export_frame,width=20,
+                                      font="Arial 14 bold", justify=CENTER)
+        self.filename_entry.grid(row=3, pady=10)
+
+        # Error message initally blank
+        self.save_error_label = Label(self.export_frame, text ="", fg="maroon",bg=background_colour)
+        self.save_error_label.grid(row=4)
+
+        # Save / Cancel Frame (row 5)
+        self.save_cancel_frame = Frame(self.export_frame)
+        self.save_cancel_frame.grid(row=5, pady=10)
+
+        # Save and Cancel Buttons (row 0 of save_cancel_frame)
+        self.save_button = Button(self.save_cancel_frame, text="Save",
+                                  command=partial(lambda: self.save_history(partner, calc_history)))
+        self.save_button.grid(row=0, column=0)
+
+        self.cancel_button = Button(self.save_cancel_frame, text="Cancel",
+                                    command=partial(self.close_export, partner))
+        self.cancel_button.grid(row=0, column=1)
 
         # Buttons
         # Save/ Cancel buttons (row 4)
